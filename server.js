@@ -47,7 +47,7 @@ io.on('connection', socket => {
     io.to(roomCode).emit('systemMessage', `${userName} joined the room ${roomCode}`);
     io.to(roomCode).emit('userList', Array.from(rooms[roomCode].users.values()));
 
-    // if no host, maybe assign new host automatically (optional)
+    // assign host if none
     if (rooms[roomCode].host === null) {
       rooms[roomCode].host = socket.id;
       io.to(roomCode).emit('systemMessage', `${userName} is now the host.`);
@@ -61,12 +61,11 @@ io.on('connection', socket => {
     }
   });
 
-  // new host assignment event
   socket.on('assignNewHost', newHostId => {
     if (!currentRoom) return;
     const room = rooms[currentRoom];
     if (!room) return;
-    if (room.host !== null) return; // host already assigned
+    if (room.host !== null) return;
 
     if (room.users.has(newHostId)) {
       room.host = newHostId;
@@ -87,9 +86,8 @@ io.on('connection', socket => {
         if (room.users.size === 0) {
           delete rooms[currentRoom];
         } else {
-          // Ask remaining users to choose new host
           io.to(currentRoom).emit('chooseNewHost', Array.from(room.users.entries()).map(([id, name]) => ({ id, name })));
-          room.host = null; // no host until reassigned
+          room.host = null;
         }
       } else {
         if (room.users.size === 0) {
@@ -101,4 +99,4 @@ io.on('connection', socket => {
 });
 
 const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
