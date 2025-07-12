@@ -224,29 +224,12 @@
     addMessage(`Joined room ${roomCode}.`, true);
   });
 
-  socket.on('userList', (users) => {
+  socket.on('userList', users => {
     usersDiv.innerHTML = '';
     users.forEach(user => {
       const userEl = document.createElement('span');
-      userEl.textContent = user.name;
+      userEl.textContent = user; // user is just a string now
       userEl.style.marginRight = '15px';
-
-      if (isHost && user.id !== socket.id) {
-        const kickBtn = document.createElement('button');
-        kickBtn.textContent = 'Kick';
-        kickBtn.style.marginLeft = '6px';
-        kickBtn.style.padding = '2px 6px';
-        kickBtn.style.border = 'none';
-        kickBtn.style.borderRadius = '4px';
-        kickBtn.style.background = '#ff4c4c';
-        kickBtn.style.color = 'white';
-        kickBtn.style.cursor = 'pointer';
-        kickBtn.onclick = () => {
-          socket.emit('kickUser', user.id);
-        };
-        userEl.appendChild(kickBtn);
-      }
-
       usersDiv.appendChild(userEl);
     });
   });
@@ -280,7 +263,7 @@
   });
 
   leaveBtn.onclick = () => {
-    location.reload(); // reload page to leave chat and reset
+    location.reload();
   };
 </script>
 
