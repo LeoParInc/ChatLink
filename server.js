@@ -1,20 +1,15 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Serve static files from 'public' folder
+// serve static files from /public
 app.use(express.static('public'));
 
-// *** Fix: serve socket.io client script correctly ***
-app.get('/socket.io/socket.io.js', (req, res) => {
-  res.sendFile(require.resolve('socket.io/client-dist/socket.io.js'));
-});
-
+// rooms data structure
 const rooms = {}; // roomCode => { users: Map(socket.id -> name), host: socket.id }
 
 io.on('connection', socket => {
@@ -26,7 +21,6 @@ io.on('connection', socket => {
       socket.emit('errorMessage', 'Room code already exists. Try another code.');
       return;
     }
-
     userName = hostName;
     currentRoom = roomCode;
 
@@ -44,7 +38,6 @@ io.on('connection', socket => {
       socket.emit('errorMessage', 'Room does not exist.');
       return;
     }
-
     userName = name;
     currentRoom = roomCode;
 
@@ -54,8 +47,8 @@ io.on('connection', socket => {
     io.to(roomCode).emit('systemMessage', `${userName} joined the room ${roomCode}`);
     io.to(roomCode).emit('userList', Array.from(rooms[roomCode].users.values()));
 
-    // if no host, assign new host automatically (optional)
-    if (rooms[roomCode].host === null) {
+    // assign host if none
+    if (!rooms[roomCode].host) {
       rooms[roomCode].host = socket.id;
       io.to(roomCode).emit('systemMessage', `${userName} is now the host.`);
       io.to(roomCode).emit('hostAssigned', socket.id);
@@ -72,7 +65,7 @@ io.on('connection', socket => {
     if (!currentRoom) return;
     const room = rooms[currentRoom];
     if (!room) return;
-    if (room.host !== null) return; // host already assigned
+    if (room.host) return; // host already assigned
 
     if (room.users.has(newHostId)) {
       room.host = newHostId;
@@ -93,9 +86,8 @@ io.on('connection', socket => {
         if (room.users.size === 0) {
           delete rooms[currentRoom];
         } else {
-          // Ask remaining users to choose new host
           io.to(currentRoom).emit('chooseNewHost', Array.from(room.users.entries()).map(([id, name]) => ({ id, name })));
-          room.host = null; // no host until reassigned
+          room.host = null;
         }
       } else {
         if (room.users.size === 0) {
