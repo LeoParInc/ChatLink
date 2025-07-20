@@ -27,5 +27,5 @@ Join or create rooms with unique codes or links and connect instantly with frien
 
 1. Clone the repo  
    ```bash
-   git clone https://github.com/yourusername/chatlink.git
+   git clone https://github.com/LeoParInc/chatlink.git
    cd chatlink
