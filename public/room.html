@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ChatLink Room</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h2>ChatLink — Room <span id="roomId"></span></h2>
+  </header>
+
+  <main>
+    <!-- Video Section -->
+    <section id="video-chat">
+      <video id="localVideo" autoplay muted playsinline></video>
+      <div id="remoteVideos"></div>
+    </section>
+
+    <!-- Controls -->
+    <section id="controls">
+      <select id="audioInput"></select>
+      <select id="videoInput"></select>
+      <button id="toggleMic">🎙️ Mute</button>
+      <button id="toggleCam">📷 Camera</button>
+    </section>
+
+    <!-- Chat Toggle -->
+    <button id="chatToggle">💬 Chat</button>
+
+    <!-- Chat Panel -->
+    <section id="chatPanel" class="hidden">
+      <header>
+        <h3>Chat</h3>
+        <button id="closeChat">❌</button>
+      </header>
+      <div id="chatMessages"></div>
+      <input id="chatInput" placeholder="Type a message..." />
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="socket.js"></script>
+  <script src="webrtc.js"></script>
+  <script src="chat.js"></script>
+  <script src="room.js"></script>
+</body>
+</html>
